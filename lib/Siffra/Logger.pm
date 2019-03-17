@@ -4,6 +4,7 @@ use 5.014;
 use strict;
 use warnings;
 use utf8;
+use Carp;
 
 $| = 1;    #autoflush
 
@@ -103,39 +104,99 @@ BEGIN
 ## Below is the stub of documentation for your module.
 ## You better edit it!
 
-=encoding UTF-8
+=pod
 
+=encoding UTF-8
 
 =head1 NAME
 
-Siffra::Logger - Siffra config for Log::Any
+Siffra::Logger - Siffra config for C<Log::Any>
 
 =head1 SYNOPSIS
 
-  use Siffra::Logger;
-  blah blah blah
+In a CPAN or other module:
 
+    package Foo;
+    use Log::Any qw($log);
+    use Siffra::Logger;
+
+    # log a string
+    $log->error("an error occurred");
+
+    # log a string and some data
+    $log->info("program started", {progname => $0, pid => $$, perl_version => $]});
+
+    # log a string and data using a format string
+    $log->debugf("arguments are: %s", \@_);
+
+    # log an error and throw an exception
+    die $log->fatal("a fatal error occurred");
+
+In your application:
+
+    use Foo;
+    use Log::Any qw($log);
+    use Siffra::Logger;
+
+    # log a string
+    $log->error("an error occurred");
+
+    # log a string and some data
+    $log->info("program started", {progname => $0, pid => $$, perl_version => $]});
+
+    # log a string and data using a format string
+    $log->debugf("arguments are: %s", \@_);
+
+    # log an error and throw an exception
+    die $log->fatal("a fatal error occurred");
+
+=head2 OUTPUTS
+
+=over 12
+
+=item C<Directory Creation>
+
+    my ( $filename, $baseDirectory, $suffix ) = fileparse( $0, qr/\.[^.]*/ );
+    my $logDirectory = $baseDirectory . 'logs/';
+    my $logFilename  = $filename . '.log';
+    croak( "Unable to create $logDirectory" ) unless ( -e $logDirectory or mkdir $logDirectory );
+
+=item C<Outputs>
+
+    [
+        'Screen',
+        name      => 'screen',
+        min_level => 'debug',
+        max_level => 'warning',
+        newline   => 1,
+        utf8      => 0,
+        stderr    => 0,
+        use_color => 1,
+    ],
+    [
+        'Screen',
+        name      => 'screen-error',
+        min_level => 'error',
+        newline   => 1,
+        utf8      => 0,
+        stderr    => 1,
+        use_color => 1,
+    ],
+    [
+        'File',
+        name      => 'file-01',
+        filename  => $logDirectory . $logFilename,
+        min_level => 'debug',
+        newline   => 1,
+        mode      => 'write',
+        binmode   => ':encoding(UTF-8)',
+    ]
+
+=back
 
 =head1 DESCRIPTION
 
-Stub documentation for this module was created by ExtUtils::ModuleMaker.
-It looks like the author of the extension was negligent enough
-to leave the stub unedited.
-
-Blah blah blah.
-
-
-=head1 USAGE
-
-
-
-=head1 BUGS
-
-
-
-=head1 SUPPORT
-
-
+C<Siffra::logger> provides a standart outputs to C<Log::Any>
 
 =head1 AUTHOR
 
@@ -153,11 +214,10 @@ it and/or modify it under the same terms as Perl itself.
 The full text of the license can be found in the
 LICENSE file included with this module.
 
-
 =head1 SEE ALSO
 
 perl(1).
- 
+
 =cut
 
 #################### main pod documentation end ###################
